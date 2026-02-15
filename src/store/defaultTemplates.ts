@@ -1,0 +1,220 @@
+import { ContractTemplate } from '@/types';
+
+export const defaultTemplates: ContractTemplate[] = [
+  {
+    id: 'tattoo-consent',
+    name: { fr: 'Consentement Tatouage', en: 'Tattoo Consent', es: 'Consentimiento Tatuaje' },
+    category: 'tattoo',
+    description: {
+      fr: 'Contrat de consentement standard pour les séances de tatouage',
+      en: 'Standard consent contract for tattoo sessions',
+      es: 'Contrato de consentimiento estándar para sesiones de tatuaje',
+    },
+    icon: '🎨',
+    sections: [
+      {
+        id: 's1',
+        title: { fr: 'Informations sur la procédure', en: 'Procedure Information', es: 'Información del procedimiento' },
+        content: {
+          fr: 'Je soussigné(e) {{NOM_CLIENT}} déclare avoir été informé(e) des risques liés à la réalisation d\'un tatouage. Le tatouage est une procédure qui consiste en l\'insertion de pigments dans le derme à l\'aide d\'aiguilles stériles à usage unique.',
+          en: 'I, the undersigned {{NOM_CLIENT}}, declare that I have been informed of the risks associated with getting a tattoo. Tattooing is a procedure that involves inserting pigments into the dermis using sterile single-use needles.',
+          es: 'Yo, el/la abajo firmante {{NOM_CLIENT}}, declaro haber sido informado/a de los riesgos asociados con la realización de un tatuaje. El tatuaje es un procedimiento que consiste en la inserción de pigmentos en la dermis mediante agujas estériles de un solo uso.',
+        },
+      },
+      {
+        id: 's2',
+        title: { fr: 'Risques et complications possibles', en: 'Possible Risks and Complications', es: 'Riesgos y complicaciones posibles' },
+        content: {
+          fr: 'Les risques incluent mais ne se limitent pas à : infections, réactions allergiques aux pigments, cicatrisation anormale (chéloïdes), insatisfaction esthétique. Des soins post-traitement appropriés sont essentiels pour minimiser ces risques.',
+          en: 'Risks include but are not limited to: infections, allergic reactions to pigments, abnormal scarring (keloids), aesthetic dissatisfaction. Appropriate post-treatment care is essential to minimize these risks.',
+          es: 'Los riesgos incluyen pero no se limitan a: infecciones, reacciones alérgicas a los pigmentos, cicatrización anormal (queloides), insatisfacción estética. Los cuidados post-tratamiento apropiados son esenciales para minimizar estos riesgos.',
+        },
+      },
+      {
+        id: 's3',
+        title: { fr: 'Soins post-traitement', en: 'Post-Treatment Care', es: 'Cuidados post-tratamiento' },
+        content: {
+          fr: 'Je m\'engage à suivre les instructions de soins post-traitement fournies par le praticien, notamment : garder le pansement pendant la durée recommandée, nettoyer la zone tatouée avec un savon doux, appliquer la crème cicatrisante prescrite, éviter l\'exposition au soleil et les bains prolongés pendant la période de cicatrisation.',
+          en: 'I commit to following the post-treatment care instructions provided by the practitioner, including: keeping the bandage for the recommended duration, cleaning the tattooed area with mild soap, applying the prescribed healing cream, avoiding sun exposure and prolonged baths during the healing period.',
+          es: 'Me comprometo a seguir las instrucciones de cuidados post-tratamiento proporcionadas por el profesional, incluyendo: mantener el vendaje durante la duración recomendada, limpiar la zona tatuada con jabón suave, aplicar la crema cicatrizante prescrita, evitar la exposición solar y los baños prolongados durante el período de cicatrización.',
+        },
+      },
+    ],
+    fields: [
+      { id: 'f1', key: 'NOM_CLIENT', label: { fr: 'Nom complet', en: 'Full name', es: 'Nombre completo' }, type: 'text', required: true },
+      { id: 'f2', key: 'EMAIL', label: { fr: 'Adresse email', en: 'Email address', es: 'Dirección email' }, type: 'email', required: true },
+      { id: 'f3', key: 'TELEPHONE', label: { fr: 'Téléphone', en: 'Phone', es: 'Teléfono' }, type: 'tel', required: false },
+      { id: 'f4', key: 'DATE_NAISSANCE', label: { fr: 'Date de naissance', en: 'Date of birth', es: 'Fecha de nacimiento' }, type: 'date', required: true },
+      { id: 'f5', key: 'ZONE_TATOUAGE', label: { fr: 'Zone à tatouer', en: 'Tattoo area', es: 'Zona a tatuar' }, type: 'text', required: true },
+      { id: 'f6', key: 'ALLERGIES', label: { fr: 'Allergies connues', en: 'Known allergies', es: 'Alergias conocidas' }, type: 'textarea', required: false, placeholder: { fr: 'Aucune ou précisez...', en: 'None or specify...', es: 'Ninguna o especifique...' } },
+      { id: 'f7', key: 'ANTECEDENTS', label: { fr: 'Antécédents médicaux', en: 'Medical history', es: 'Antecedentes médicos' }, type: 'textarea', required: false, placeholder: { fr: 'Maladies, traitements en cours...', en: 'Diseases, ongoing treatments...', es: 'Enfermedades, tratamientos en curso...' } },
+    ],
+    checkboxes: [
+      { id: 'c1', label: { fr: 'J\'ai lu et compris l\'intégralité de ce contrat de consentement', en: 'I have read and understood this entire consent contract', es: 'He leído y comprendido la totalidad de este contrato de consentimiento' }, required: true },
+      { id: 'c2', label: { fr: 'J\'accepte les risques inhérents à la procédure de tatouage', en: 'I accept the inherent risks of the tattooing procedure', es: 'Acepto los riesgos inherentes al procedimiento de tatuaje' }, required: true },
+      { id: 'c3', label: { fr: 'Je certifie avoir plus de 18 ans ou disposer d\'une autorisation parentale', en: 'I certify that I am over 18 or have parental authorization', es: 'Certifico tener más de 18 años o contar con autorización parental' }, required: true },
+      { id: 'c4', label: { fr: 'J\'autorise la prise de photos avant/après pour le portfolio du praticien', en: 'I authorize before/after photos for the practitioner\'s portfolio', es: 'Autorizo la toma de fotos antes/después para el portafolio del profesional' }, required: false },
+      { id: 'c5', label: { fr: 'Je m\'engage à suivre les soins post-traitement recommandés', en: 'I commit to following the recommended post-treatment care', es: 'Me comprometo a seguir los cuidados post-tratamiento recomendados' }, required: true },
+    ],
+    tags: ['tattoo', 'standard'],
+    archived: false,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+  },
+  {
+    id: 'microblading-consent',
+    name: { fr: 'Consentement Microblading', en: 'Microblading Consent', es: 'Consentimiento Microblading' },
+    category: 'microblading',
+    description: {
+      fr: 'Contrat de consentement pour les procédures de microblading et maquillage permanent',
+      en: 'Consent contract for microblading and permanent makeup procedures',
+      es: 'Contrato de consentimiento para procedimientos de microblading y maquillaje permanente',
+    },
+    icon: '✨',
+    sections: [
+      {
+        id: 's1',
+        title: { fr: 'Description de la procédure', en: 'Procedure Description', es: 'Descripción del procedimiento' },
+        content: {
+          fr: 'Le microblading est une technique de maquillage semi-permanent des sourcils. Des micro-incisions sont réalisées dans l\'épiderme pour y déposer des pigments. Le résultat dure généralement entre 12 et 18 mois.',
+          en: 'Microblading is a semi-permanent eyebrow makeup technique. Micro-incisions are made in the epidermis to deposit pigments. The result typically lasts between 12 and 18 months.',
+          es: 'El microblading es una técnica de maquillaje semipermanente de cejas. Se realizan micro-incisiones en la epidermis para depositar pigmentos. El resultado suele durar entre 12 y 18 meses.',
+        },
+      },
+    ],
+    fields: [
+      { id: 'f1', key: 'NOM_CLIENT', label: { fr: 'Nom complet', en: 'Full name', es: 'Nombre completo' }, type: 'text', required: true },
+      { id: 'f2', key: 'EMAIL', label: { fr: 'Adresse email', en: 'Email address', es: 'Dirección email' }, type: 'email', required: true },
+      { id: 'f3', key: 'TELEPHONE', label: { fr: 'Téléphone', en: 'Phone', es: 'Teléfono' }, type: 'tel', required: false },
+      { id: 'f4', key: 'DATE_NAISSANCE', label: { fr: 'Date de naissance', en: 'Date of birth', es: 'Fecha de nacimiento' }, type: 'date', required: true },
+      { id: 'f5', key: 'ALLERGIES', label: { fr: 'Allergies connues', en: 'Known allergies', es: 'Alergias conocidas' }, type: 'textarea', required: false },
+      { id: 'f6', key: 'GROSSESSE', label: { fr: 'Êtes-vous enceinte ou allaitante ?', en: 'Are you pregnant or breastfeeding?', es: '¿Está embarazada o en período de lactancia?' }, type: 'text', required: true },
+    ],
+    checkboxes: [
+      { id: 'c1', label: { fr: 'J\'ai lu et compris ce contrat de consentement', en: 'I have read and understood this consent contract', es: 'He leído y comprendido este contrato de consentimiento' }, required: true },
+      { id: 'c2', label: { fr: 'J\'accepte les risques liés à la procédure', en: 'I accept the risks associated with the procedure', es: 'Acepto los riesgos asociados al procedimiento' }, required: true },
+      { id: 'c3', label: { fr: 'J\'autorise la prise de photos', en: 'I authorize photos', es: 'Autorizo la toma de fotos' }, required: false },
+    ],
+    tags: ['microblading', 'permanent-makeup'],
+    archived: false,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+  },
+  {
+    id: 'piercing-consent',
+    name: { fr: 'Consentement Piercing', en: 'Piercing Consent', es: 'Consentimiento Piercing' },
+    category: 'piercing',
+    description: {
+      fr: 'Contrat de consentement pour les procédures de piercing',
+      en: 'Consent contract for piercing procedures',
+      es: 'Contrato de consentimiento para procedimientos de piercing',
+    },
+    icon: '💎',
+    sections: [
+      {
+        id: 's1',
+        title: { fr: 'Informations sur le piercing', en: 'Piercing Information', es: 'Información sobre el piercing' },
+        content: {
+          fr: 'Le piercing corporel est une procédure qui consiste à percer la peau ou le cartilage pour y insérer un bijou. Cette procédure comporte des risques d\'infection, de réaction allergique et de cicatrisation anormale.',
+          en: 'Body piercing is a procedure that involves piercing the skin or cartilage to insert jewelry. This procedure carries risks of infection, allergic reaction, and abnormal scarring.',
+          es: 'El piercing corporal es un procedimiento que consiste en perforar la piel o el cartílago para insertar una joya. Este procedimiento conlleva riesgos de infección, reacción alérgica y cicatrización anormal.',
+        },
+      },
+    ],
+    fields: [
+      { id: 'f1', key: 'NOM_CLIENT', label: { fr: 'Nom complet', en: 'Full name', es: 'Nombre completo' }, type: 'text', required: true },
+      { id: 'f2', key: 'EMAIL', label: { fr: 'Adresse email', en: 'Email address', es: 'Dirección email' }, type: 'email', required: true },
+      { id: 'f3', key: 'DATE_NAISSANCE', label: { fr: 'Date de naissance', en: 'Date of birth', es: 'Fecha de nacimiento' }, type: 'date', required: true },
+      { id: 'f4', key: 'ZONE_PIERCING', label: { fr: 'Zone de piercing', en: 'Piercing area', es: 'Zona de piercing' }, type: 'text', required: true },
+      { id: 'f5', key: 'ALLERGIES', label: { fr: 'Allergies aux métaux', en: 'Metal allergies', es: 'Alergias a los metales' }, type: 'textarea', required: false },
+    ],
+    checkboxes: [
+      { id: 'c1', label: { fr: 'J\'ai lu et compris ce contrat', en: 'I have read and understood this contract', es: 'He leído y comprendido este contrato' }, required: true },
+      { id: 'c2', label: { fr: 'J\'accepte les risques', en: 'I accept the risks', es: 'Acepto los riesgos' }, required: true },
+      { id: 'c3', label: { fr: 'Je certifie avoir plus de 16 ans', en: 'I certify I am over 16', es: 'Certifico tener más de 16 años' }, required: true },
+    ],
+    tags: ['piercing'],
+    archived: false,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+  },
+  {
+    id: 'aesthetic-consent',
+    name: { fr: 'Consentement Soins Esthétiques', en: 'Aesthetic Care Consent', es: 'Consentimiento Cuidados Estéticos' },
+    category: 'aesthetic',
+    description: {
+      fr: 'Contrat de consentement pour les soins esthétiques (soins du visage, épilation, etc.)',
+      en: 'Consent contract for aesthetic care (facial treatments, hair removal, etc.)',
+      es: 'Contrato de consentimiento para cuidados estéticos (tratamientos faciales, depilación, etc.)',
+    },
+    icon: '🌿',
+    sections: [
+      {
+        id: 's1',
+        title: { fr: 'Description du soin', en: 'Treatment Description', es: 'Descripción del tratamiento' },
+        content: {
+          fr: 'Je soussigné(e) {{NOM_CLIENT}} consens à recevoir le soin esthétique décrit ci-dessous. J\'ai été informé(e) des contre-indications éventuelles et des effets secondaires possibles.',
+          en: 'I, the undersigned {{NOM_CLIENT}}, consent to receive the aesthetic treatment described below. I have been informed of any contraindications and possible side effects.',
+          es: 'Yo, el/la abajo firmante {{NOM_CLIENT}}, consiento recibir el tratamiento estético descrito a continuación. He sido informado/a de las posibles contraindicaciones y efectos secundarios.',
+        },
+      },
+    ],
+    fields: [
+      { id: 'f1', key: 'NOM_CLIENT', label: { fr: 'Nom complet', en: 'Full name', es: 'Nombre completo' }, type: 'text', required: true },
+      { id: 'f2', key: 'EMAIL', label: { fr: 'Adresse email', en: 'Email address', es: 'Dirección email' }, type: 'email', required: true },
+      { id: 'f3', key: 'TELEPHONE', label: { fr: 'Téléphone', en: 'Phone', es: 'Teléfono' }, type: 'tel', required: false },
+      { id: 'f4', key: 'SOIN', label: { fr: 'Type de soin', en: 'Treatment type', es: 'Tipo de tratamiento' }, type: 'text', required: true },
+      { id: 'f5', key: 'ALLERGIES', label: { fr: 'Allergies connues', en: 'Known allergies', es: 'Alergias conocidas' }, type: 'textarea', required: false },
+    ],
+    checkboxes: [
+      { id: 'c1', label: { fr: 'J\'ai lu et compris ce contrat', en: 'I have read and understood this contract', es: 'He leído y comprendido este contrato' }, required: true },
+      { id: 'c2', label: { fr: 'J\'accepte les risques', en: 'I accept the risks', es: 'Acepto los riesgos' }, required: true },
+      { id: 'c3', label: { fr: 'J\'autorise les photos avant/après', en: 'I authorize before/after photos', es: 'Autorizo fotos antes/después' }, required: false },
+    ],
+    tags: ['aesthetic', 'beauty'],
+    archived: false,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+  },
+  {
+    id: 'medical-aesthetic-consent',
+    name: { fr: 'Consentement Médecine Esthétique', en: 'Aesthetic Medicine Consent', es: 'Consentimiento Medicina Estética' },
+    category: 'medical',
+    description: {
+      fr: 'Contrat de consentement pour les actes de médecine esthétique (injections, laser, etc.)',
+      en: 'Consent contract for aesthetic medicine procedures (injections, laser, etc.)',
+      es: 'Contrato de consentimiento para procedimientos de medicina estética (inyecciones, láser, etc.)',
+    },
+    icon: '💉',
+    sections: [
+      {
+        id: 's1',
+        title: { fr: 'Nature de l\'acte médical', en: 'Nature of Medical Procedure', es: 'Naturaleza del acto médico' },
+        content: {
+          fr: 'Je soussigné(e) {{NOM_CLIENT}} consens à l\'acte de médecine esthétique suivant, réalisé par le Dr. {{NOM_PRATICIEN}}. J\'ai été informé(e) de manière complète et détaillée des risques, des alternatives et des résultats attendus.',
+          en: 'I, the undersigned {{NOM_CLIENT}}, consent to the following aesthetic medicine procedure, performed by Dr. {{NOM_PRATICIEN}}. I have been fully and thoroughly informed of the risks, alternatives, and expected results.',
+          es: 'Yo, el/la abajo firmante {{NOM_CLIENT}}, consiento el siguiente acto de medicina estética, realizado por el Dr. {{NOM_PRATICIEN}}. He sido informado/a de manera completa y detallada de los riesgos, alternativas y resultados esperados.',
+        },
+      },
+    ],
+    fields: [
+      { id: 'f1', key: 'NOM_CLIENT', label: { fr: 'Nom complet', en: 'Full name', es: 'Nombre completo' }, type: 'text', required: true },
+      { id: 'f2', key: 'EMAIL', label: { fr: 'Adresse email', en: 'Email address', es: 'Dirección email' }, type: 'email', required: true },
+      { id: 'f3', key: 'TELEPHONE', label: { fr: 'Téléphone', en: 'Phone', es: 'Teléfono' }, type: 'tel', required: false },
+      { id: 'f4', key: 'DATE_NAISSANCE', label: { fr: 'Date de naissance', en: 'Date of birth', es: 'Fecha de nacimiento' }, type: 'date', required: true },
+      { id: 'f5', key: 'ACTE', label: { fr: 'Acte médical prévu', en: 'Planned medical procedure', es: 'Procedimiento médico previsto' }, type: 'text', required: true },
+      { id: 'f6', key: 'ANTECEDENTS', label: { fr: 'Antécédents médicaux', en: 'Medical history', es: 'Antecedentes médicos' }, type: 'textarea', required: true },
+      { id: 'f7', key: 'TRAITEMENTS', label: { fr: 'Traitements en cours', en: 'Current treatments', es: 'Tratamientos en curso' }, type: 'textarea', required: false },
+    ],
+    checkboxes: [
+      { id: 'c1', label: { fr: 'J\'ai lu et compris ce contrat de consentement éclairé', en: 'I have read and understood this informed consent contract', es: 'He leído y comprendido este contrato de consentimiento informado' }, required: true },
+      { id: 'c2', label: { fr: 'J\'accepte les risques inhérents à l\'acte médical', en: 'I accept the inherent risks of the medical procedure', es: 'Acepto los riesgos inherentes al acto médico' }, required: true },
+      { id: 'c3', label: { fr: 'J\'ai été informé(e) des alternatives possibles', en: 'I have been informed of possible alternatives', es: 'He sido informado/a de las alternativas posibles' }, required: true },
+      { id: 'c4', label: { fr: 'J\'autorise la prise de photos médicales', en: 'I authorize medical photos', es: 'Autorizo la toma de fotos médicas' }, required: false },
+    ],
+    tags: ['medical', 'injections', 'laser'],
+    archived: false,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+  },
+];
