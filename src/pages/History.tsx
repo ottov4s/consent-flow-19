@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getSignedContracts } from '@/store/repository';
+import { getSignedContracts, getTemplates } from '@/store/repository';
 import { PinGuard } from '@/components/PinGuard';
+import { generateContractPdf } from '@/lib/generatePdf';
 import { motion } from 'framer-motion';
-import { Search, ArrowLeft, Calendar, Mail, Eye } from 'lucide-react';
+import { Search, ArrowLeft, Calendar, Mail, Eye, Download } from 'lucide-react';
 
 const History = () => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
   const [search, setSearch] = useState('');
   const contracts = getSignedContracts();
+  const templates = getTemplates();
 
   const filtered = useMemo(() => {
     if (!search) return contracts;
@@ -22,6 +24,13 @@ const History = () => {
         c.templateName.toLowerCase().includes(q)
     );
   }, [contracts, search]);
+
+  const handleExportPdf = (contractId: string) => {
+    const contract = contracts.find(c => c.id === contractId);
+    if (!contract) return;
+    const template = templates.find(t => t.id === contract.templateId);
+    generateContractPdf(contract, template);
+  };
 
   return (
     <PinGuard>
@@ -80,6 +89,13 @@ const History = () => {
                     </span>
                   </div>
                 </div>
+                <button
+                  onClick={() => handleExportPdf(contract.id)}
+                  className="touch-button p-3 bg-primary/10 text-primary rounded-xl"
+                  title={language === 'fr' ? 'Exporter en PDF' : 'Export PDF'}
+                >
+                  <Download size={20} />
+                </button>
                 <button className="touch-button p-3 bg-secondary rounded-xl">
                   <Eye size={20} />
                 </button>

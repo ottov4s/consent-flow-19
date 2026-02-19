@@ -77,9 +77,19 @@ const Templates = () => {
               key={tpl.id}
               template={tpl}
               onUse={(id) => navigate(`/contract/${id}`)}
+              onEdit={(id) => navigate(`/editor/${id}`)}
             />
           ))}
         </div>
+
+        {/* Add new template button */}
+        <button
+          onClick={() => navigate('/editor/new')}
+          className="w-full card-elevated p-6 flex items-center justify-center gap-3 text-primary font-semibold text-lg border-2 border-dashed border-primary/30 hover:border-primary/60 transition-colors"
+        >
+          <span className="text-2xl">+</span>
+          {language === 'fr' ? 'Créer un nouveau modèle' : language === 'es' ? 'Crear nueva plantilla' : 'Create new template'}
+        </button>
 
         {filtered.length === 0 && (
           <div className="text-center py-16 text-muted-foreground text-lg">

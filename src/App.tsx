@@ -10,6 +10,7 @@ import Templates from "./pages/Templates";
 import ContractForm from "./pages/ContractForm";
 import History from "./pages/History";
 import SettingsPage from "./pages/Settings";
+import TemplateEditor from "./pages/TemplateEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/contract/:templateId" element={<ContractForm />} />
               <Route path="/history" element={<History />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/editor/:templateId" element={<TemplateEditor />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <BottomNav />
