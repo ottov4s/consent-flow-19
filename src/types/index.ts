@@ -14,6 +14,7 @@ export interface ConsentCheckbox {
   id: string;
   label: Record<Language, string>;
   required: boolean;
+  defaultChecked?: boolean;
 }
 
 export interface ContractSection {
