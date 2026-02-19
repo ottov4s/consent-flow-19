@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTemplates, saveTemplate } from '@/store/repository';
@@ -7,7 +7,7 @@ import { PinGuard } from '@/components/PinGuard';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Plus, Trash2, GripVertical, Type, Mail, Phone, Calendar,
-  AlignLeft, List, CheckSquare, PenTool, Save, ChevronDown, ChevronUp, Copy
+  AlignLeft, List, CheckSquare, Save, ChevronDown, ChevronUp, Copy
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,6 +21,44 @@ const FIELD_TYPES: { value: DynamicField['type']; icon: any; label: Record<Langu
 ];
 
 const emptyMultilang = (): Record<Language, string> => ({ fr: '', en: '', es: '' });
+
+// Generic drag & drop hook for arrays
+function useDragReorder<T extends { id: string }>(
+  items: T[],
+  onReorder: (items: T[]) => void,
+  listType: string
+) {
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
+
+  const handleDragStart = (idx: number) => {
+    dragItem.current = idx;
+  };
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    dragOverItem.current = idx;
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (dragItem.current === null || dragOverItem.current === null) return;
+    if (dragItem.current === dragOverItem.current) return;
+    const reordered = [...items];
+    const [moved] = reordered.splice(dragItem.current, 1);
+    reordered.splice(dragOverItem.current, 0, moved);
+    onReorder(reordered);
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  const handleDragEnd = () => {
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  return { handleDragStart, handleDragOver, handleDrop, handleDragEnd };
+}
 
 const TemplateEditor = () => {
   const { templateId } = useParams<{ templateId: string }>();
@@ -90,6 +128,37 @@ const TemplateEditor = () => {
     updateTemplate({ fields: template.fields.filter(f => f.id !== id) });
   };
 
+  // Select option management
+  const addSelectOption = (fieldId: string) => {
+    const field = template.fields.find(f => f.id === fieldId);
+    if (!field || !field.options) return;
+    const newOptions: Record<Language, string[]> = {
+      fr: [...(field.options.fr || []), ''],
+      en: [...(field.options.en || []), ''],
+      es: [...(field.options.es || []), ''],
+    };
+    updateField(fieldId, { options: newOptions });
+  };
+
+  const removeSelectOption = (fieldId: string, optionIndex: number) => {
+    const field = template.fields.find(f => f.id === fieldId);
+    if (!field || !field.options) return;
+    const newOptions: Record<Language, string[]> = {
+      fr: field.options.fr.filter((_, i) => i !== optionIndex),
+      en: field.options.en.filter((_, i) => i !== optionIndex),
+      es: field.options.es.filter((_, i) => i !== optionIndex),
+    };
+    updateField(fieldId, { options: newOptions });
+  };
+
+  const updateSelectOption = (fieldId: string, lang: Language, optionIndex: number, value: string) => {
+    const field = template.fields.find(f => f.id === fieldId);
+    if (!field || !field.options) return;
+    const newLangOptions = [...(field.options[lang] || [])];
+    newLangOptions[optionIndex] = value;
+    updateField(fieldId, { options: { ...field.options, [lang]: newLangOptions } });
+  };
+
   // Sections
   const addSection = () => {
     const newSection: ContractSection = {
@@ -132,6 +201,11 @@ const TemplateEditor = () => {
     updateTemplate({ checkboxes: template.checkboxes.filter(c => c.id !== id) });
   };
 
+  // Drag & drop hooks
+  const fieldsDrag = useDragReorder(template.fields, (fields) => updateTemplate({ fields }), 'fields');
+  const sectionsDrag = useDragReorder(template.sections, (sections) => updateTemplate({ sections }), 'sections');
+  const checkboxesDrag = useDragReorder(template.checkboxes, (checkboxes) => updateTemplate({ checkboxes }), 'checkboxes');
+
   const tabs = [
     { key: 'info' as const, label: language === 'fr' ? 'Infos' : language === 'es' ? 'Info' : 'Info' },
     { key: 'sections' as const, label: language === 'fr' ? 'Sections' : 'Sections' },
@@ -141,8 +215,6 @@ const TemplateEditor = () => {
 
   const categories = ['tattoo', 'microblading', 'piercing', 'aesthetic', 'medical'];
   const icons = ['📄', '🎨', '✨', '💎', '🌿', '💉', '✍️', '📋', '🏥', '💆'];
-
-  // Collect all field keys for replication hint
   const allFieldKeys = template.fields.map(f => f.key);
 
   return (
@@ -194,7 +266,6 @@ const TemplateEditor = () => {
             {/* INFO TAB */}
             {activeTab === 'info' && (
               <div className="space-y-5">
-                {/* Name */}
                 <div className="card-elevated p-5 space-y-4">
                   <h3 className="font-bold text-lg">{language === 'fr' ? 'Nom du modèle' : 'Template Name'}</h3>
                   {(['fr', 'en', 'es'] as Language[]).map(lang => (
@@ -210,7 +281,6 @@ const TemplateEditor = () => {
                   ))}
                 </div>
 
-                {/* Description */}
                 <div className="card-elevated p-5 space-y-4">
                   <h3 className="font-bold text-lg">{language === 'fr' ? 'Description' : 'Description'}</h3>
                   {(['fr', 'en', 'es'] as Language[]).map(lang => (
@@ -226,7 +296,6 @@ const TemplateEditor = () => {
                   ))}
                 </div>
 
-                {/* Category & Icon */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="card-elevated p-5 space-y-3">
                     <h3 className="font-bold text-lg">{language === 'fr' ? 'Catégorie' : 'Category'}</h3>
@@ -258,7 +327,6 @@ const TemplateEditor = () => {
                   </div>
                 </div>
 
-                {/* Tags */}
                 <div className="card-elevated p-5 space-y-3">
                   <h3 className="font-bold text-lg">Tags</h3>
                   <input
@@ -277,8 +345,8 @@ const TemplateEditor = () => {
                 <div className="flex items-center justify-between">
                   <p className="text-muted-foreground text-sm">
                     {language === 'fr'
-                      ? 'Utilisez {{CLE}} pour insérer la valeur d\'un champ (ex: {{NOM_CLIENT}})'
-                      : 'Use {{KEY}} to insert a field value (e.g. {{NOM_CLIENT}})'}
+                      ? 'Utilisez {{CLE}} pour insérer la valeur d\'un champ. Glissez ⠿ pour réordonner.'
+                      : 'Use {{KEY}} to insert a field value. Drag ⠿ to reorder.'}
                   </p>
                   <button onClick={addSection} className="touch-button px-5 py-3 bg-primary text-primary-foreground rounded-xl flex items-center gap-2">
                     <Plus size={18} />
@@ -287,12 +355,20 @@ const TemplateEditor = () => {
                 </div>
 
                 {template.sections.map((section, idx) => (
-                  <div key={section.id} className="card-elevated overflow-hidden">
+                  <div
+                    key={section.id}
+                    className="card-elevated overflow-hidden"
+                    draggable
+                    onDragStart={() => sectionsDrag.handleDragStart(idx)}
+                    onDragOver={(e) => sectionsDrag.handleDragOver(e, idx)}
+                    onDrop={sectionsDrag.handleDrop}
+                    onDragEnd={sectionsDrag.handleDragEnd}
+                  >
                     <button
                       onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
                       className="w-full p-5 flex items-center gap-3 text-left"
                     >
-                      <GripVertical size={18} className="text-muted-foreground" />
+                      <GripVertical size={18} className="text-muted-foreground cursor-grab active:cursor-grabbing" />
                       <span className="font-bold flex-1">
                         {section.title[language] || `Section ${idx + 1}`}
                       </span>
@@ -380,15 +456,24 @@ const TemplateEditor = () => {
 
                 <p className="text-xs text-muted-foreground">
                   {language === 'fr'
-                    ? '💡 Utilisez la même CLÉ pour plusieurs champs afin de répliquer automatiquement la saisie (ex: NOM_CLIENT saisi une fois, affiché partout).'
-                    : '💡 Use the same KEY for multiple fields to auto-replicate input across the form.'}
+                    ? '💡 Glissez ⠿ pour réordonner. Utilisez la même CLÉ pour répliquer la saisie.'
+                    : '💡 Drag ⠿ to reorder. Use the same KEY to replicate input.'}
                 </p>
 
                 {template.fields.map((field, idx) => {
                   const TypeIcon = FIELD_TYPES.find(ft => ft.value === field.type)?.icon || Type;
                   return (
-                    <div key={field.id} className="card-elevated p-5 space-y-3">
+                    <div
+                      key={field.id}
+                      className="card-elevated p-5 space-y-3"
+                      draggable
+                      onDragStart={() => fieldsDrag.handleDragStart(idx)}
+                      onDragOver={(e) => fieldsDrag.handleDragOver(e, idx)}
+                      onDrop={fieldsDrag.handleDrop}
+                      onDragEnd={fieldsDrag.handleDragEnd}
+                    >
                       <div className="flex items-center gap-3">
+                        <GripVertical size={18} className="text-muted-foreground cursor-grab active:cursor-grabbing shrink-0" />
                         <TypeIcon size={18} className="text-primary shrink-0" />
                         <span className="text-sm font-mono text-muted-foreground bg-secondary px-2 py-1 rounded">
                           {FIELD_TYPES.find(ft => ft.value === field.type)?.label[language]}
@@ -440,25 +525,52 @@ const TemplateEditor = () => {
                         </div>
                       ))}
 
-                      {/* Select options */}
+                      {/* Select options - individual inputs */}
                       {field.type === 'select' && (
-                        <div className="space-y-2 mt-2 pl-4 border-l-2 border-primary/20">
-                          <h4 className="text-sm font-semibold text-muted-foreground">
-                            {language === 'fr' ? 'Options de la liste' : 'Dropdown options'}
-                          </h4>
-                          {(['fr', 'en', 'es'] as Language[]).map(lang => (
-                            <div key={lang} className="flex items-center gap-3">
-                              <span className="w-8 text-xs font-bold text-muted-foreground uppercase">{lang}</span>
-                              <input
-                                value={(field.options?.[lang] || []).join(', ')}
-                                onChange={e => updateField(field.id, {
-                                  options: { ...(field.options || { fr: [], en: [], es: [] }), [lang]: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }
-                                })}
-                                placeholder="Option 1, Option 2, Option 3"
-                                className="flex-1 p-2 bg-background border-2 border-border rounded-lg text-sm focus:border-primary focus:outline-none"
-                              />
+                        <div className="space-y-3 mt-2 pl-4 border-l-2 border-primary/20">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-semibold text-muted-foreground">
+                              {language === 'fr' ? 'Options de la liste' : 'Dropdown options'}
+                            </h4>
+                            <button
+                              onClick={() => addSelectOption(field.id)}
+                              className="touch-button px-3 py-1.5 bg-primary text-primary-foreground rounded-lg flex items-center gap-1 text-xs font-medium"
+                            >
+                              <Plus size={14} />
+                              {language === 'fr' ? 'Ajouter une option' : 'Add option'}
+                            </button>
+                          </div>
+                          {(field.options?.fr || []).map((_, optIdx) => (
+                            <div key={optIdx} className="card-elevated p-3 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-muted-foreground">
+                                  {language === 'fr' ? `Option ${optIdx + 1}` : `Option ${optIdx + 1}`}
+                                </span>
+                                <button
+                                  onClick={() => removeSelectOption(field.id, optIdx)}
+                                  className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                              {(['fr', 'en', 'es'] as Language[]).map(lang => (
+                                <div key={lang} className="flex items-center gap-2">
+                                  <span className="w-8 text-xs font-bold text-muted-foreground uppercase">{lang}</span>
+                                  <input
+                                    value={field.options?.[lang]?.[optIdx] || ''}
+                                    onChange={e => updateSelectOption(field.id, lang, optIdx, e.target.value)}
+                                    placeholder={`${language === 'fr' ? 'Valeur' : 'Value'} (${lang})`}
+                                    className="flex-1 p-2 bg-background border-2 border-border rounded-lg text-sm focus:border-primary focus:outline-none"
+                                  />
+                                </div>
+                              ))}
                             </div>
                           ))}
+                          {(field.options?.fr || []).length === 0 && (
+                            <p className="text-xs text-muted-foreground italic">
+                              {language === 'fr' ? 'Aucune option. Cliquez sur "Ajouter une option".' : 'No options. Click "Add option".'}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -476,15 +588,29 @@ const TemplateEditor = () => {
             {/* CHECKBOXES TAB */}
             {activeTab === 'checkboxes' && (
               <div className="space-y-4">
-                <button onClick={addCheckbox} className="touch-button px-5 py-3 bg-primary text-primary-foreground rounded-xl flex items-center gap-2">
-                  <Plus size={18} />
-                  <CheckSquare size={18} />
-                  {language === 'fr' ? 'Ajouter une case' : 'Add checkbox'}
-                </button>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'fr' ? 'Glissez ⠿ pour réordonner les cases.' : 'Drag ⠿ to reorder checkboxes.'}
+                  </p>
+                  <button onClick={addCheckbox} className="touch-button px-5 py-3 bg-primary text-primary-foreground rounded-xl flex items-center gap-2">
+                    <Plus size={18} />
+                    <CheckSquare size={18} />
+                    {language === 'fr' ? 'Ajouter une case' : 'Add checkbox'}
+                  </button>
+                </div>
 
                 {template.checkboxes.map((cb, idx) => (
-                  <div key={cb.id} className="card-elevated p-5 space-y-3">
+                  <div
+                    key={cb.id}
+                    className="card-elevated p-5 space-y-3"
+                    draggable
+                    onDragStart={() => checkboxesDrag.handleDragStart(idx)}
+                    onDragOver={(e) => checkboxesDrag.handleDragOver(e, idx)}
+                    onDrop={checkboxesDrag.handleDrop}
+                    onDragEnd={checkboxesDrag.handleDragEnd}
+                  >
                     <div className="flex items-center gap-3">
+                      <GripVertical size={18} className="text-muted-foreground cursor-grab active:cursor-grabbing shrink-0" />
                       <CheckSquare size={18} className="text-primary shrink-0" />
                       <span className="text-sm text-muted-foreground">
                         {language === 'fr' ? `Case ${idx + 1}` : `Checkbox ${idx + 1}`}
